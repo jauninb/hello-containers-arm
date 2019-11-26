@@ -11,8 +11,13 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+FROM multiarch/qemu-user-static as qemu
 
 FROM arm32v7/node:12-alpine
+
+# copy qemu - https://ownyourbits.com/2018/06/27/running-and-building-arm-docker-containers-in-x86/
+# but relying on https://hub.docker.com/r/multiarch/qemu-user-static/ to provide the emulator
+COPY --from=qemu /usr/bin/qemu-arm-static /usr/bin
 
 # Install the application
 ADD package.json /app/package.json
