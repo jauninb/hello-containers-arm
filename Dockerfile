@@ -19,13 +19,20 @@ FROM arm32v7/node:12-alpine
 # - inspired from https://ownyourbits.com/2018/06/27/running-and-building-arm-docker-containers-in-x86/
 WORKDIR /qemu/bin
 COPY --from=qemu /usr/bin/qemu-arm-static /qemu/bin
-RUN ls -l /qemu/bin
 WORKDIR /
 
 # Install the application
 ADD package.json /app/package.json
 RUN cd /app && npm install
 COPY app.js /app/app.js
+
+# Support to for arbitrary UserIds
+# https://docs.openshift.com/container-platform/3.11/creating_images/guidelines.html#openshift-specific-guidelines
+RUN chmod -R u+x /app && \
+    chgrp -R 0 /app && \
+    chmod -R g=u /app /etc/passwd
+
+USER 1001
 
 WORKDIR /app
 
